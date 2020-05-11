@@ -14,7 +14,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Sqflite Tutorial',
         theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
+          primarySwatch: Colors.green,
+          canvasColor: Colors.white
+//            TODO maybe try to add your own photos as a background
         ),
         home: AlertList(),
       ),

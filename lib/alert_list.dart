@@ -64,7 +64,7 @@ class _AlertListState extends State<AlertList> {
   Widget build(BuildContext context) {
     print("Building entire alert list scaffold");
     return Scaffold(
-      appBar: AppBar(title: Text("AlertList")),
+      appBar: AppBar(title: Text("remembly")),
       body: Container(
         child: BlocConsumer<AlertBloc, List<Alert>>(
           builder: (context, alertList) {
@@ -74,11 +74,12 @@ class _AlertListState extends State<AlertList> {
 
                 Alert alert = alertList[index];
                 return ListTile(
-                    title: Text(alert.name, style: TextStyle(fontSize: 30)),
+                    title: Text(alert.name, style: TextStyle(fontSize: 25)),
                     subtitle: Text(
-                      "Description: ${alert.description}\nEnabled: ${alert.enabled}",
-                      style: TextStyle(fontSize: 20),
+                      "${alert.description}\n${alert.startTime} - ${alert.endTime}\nEnabled: ${alert.enabled}",
+                      style: TextStyle(fontSize: 15),
                     ),
+                    trailing: Text("${alert.startTime} - ${alert.endTime}"),
                     onTap: () => showAlertDialog(context, alert, index));
               },
               itemCount: alertList.length,

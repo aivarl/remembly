@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:CWCFlutter/model/alert.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,7 +10,9 @@ class DatabaseProvider {
   static const String COLUMN_ID = "id";
   static const String COLUMN_NAME = "name";
   static const String COLUMN_DESCRIPTION = "description";
-  static const String COLUMN_Enabled = "enabled";
+  static const String COLUMN_ENABLED = "enabled";
+  static const String COLUMN_START_TIME = "startTime";
+  static const String COLUMN_END_TIME = "endTime";
 
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
@@ -41,7 +45,9 @@ class DatabaseProvider {
           "$COLUMN_ID INTEGER PRIMARY KEY,"
           "$COLUMN_NAME TEXT,"
           "$COLUMN_DESCRIPTION TEXT,"
-          "$COLUMN_Enabled INTEGER"
+          "$COLUMN_ENABLED INTEGER,"
+          "$COLUMN_START_TIME DATETIME,"
+          "$COLUMN_END_TIME DATETIME"
           ")",
         );
       },
@@ -52,7 +58,7 @@ class DatabaseProvider {
     final db = await database;
 
     var alerts = await db
-        .query(TABLE_ALERT, columns: [COLUMN_ID, COLUMN_NAME, COLUMN_DESCRIPTION, COLUMN_Enabled]);
+        .query(TABLE_ALERT, columns: [COLUMN_ID, COLUMN_NAME, COLUMN_DESCRIPTION, COLUMN_ENABLED, COLUMN_START_TIME, COLUMN_END_TIME]);
 
     List<Alert> alertList = List<Alert>();
 
