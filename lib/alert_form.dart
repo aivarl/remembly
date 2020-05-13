@@ -5,6 +5,7 @@ import 'package:CWCFlutter/events/update_alert.dart';
 import 'package:CWCFlutter/model/alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AlertForm extends StatefulWidget {
   final Alert alert;
@@ -25,6 +26,8 @@ class AlertFormState extends State<AlertForm> {
   TimeOfDay _startTime = TimeOfDay.now();
   TimeOfDay _endTime = TimeOfDay.now();
   bool _enabled = true;
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -169,6 +172,8 @@ class AlertFormState extends State<AlertForm> {
                                 AddAlert(storedAlert),
                               ),
                             );
+                        //TODO I guess here I should schedule the notification
+                        _showNotification();
 
                         Navigator.pop(context);
                       },
@@ -202,6 +207,8 @@ class AlertFormState extends State<AlertForm> {
                                     UpdateAlert(widget.alertIndex, alert),
                                   ),
                                 );
+                            //TODO I guess here I should schedule the notification
+                            _showNotification();
 
                             Navigator.pop(context);
                           },
@@ -220,5 +227,17 @@ class AlertFormState extends State<AlertForm> {
         ),
       ),
     );
+  }
+
+  Future<void> _showNotification() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0, 'plain title', 'plain body', platformChannelSpecifics,
+        payload: 'item x');
   }
 }

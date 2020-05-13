@@ -16,8 +16,8 @@ class Alert {
       DatabaseProvider.COLUMN_NAME: name,
       DatabaseProvider.COLUMN_DESCRIPTION: description,
       DatabaseProvider.COLUMN_ENABLED: enabled ? 1 : 0,
-      DatabaseProvider.COLUMN_START_TIME: startTime.toString(),
-      DatabaseProvider.COLUMN_END_TIME: endTime.toString()
+      DatabaseProvider.COLUMN_START_TIME: startTime.hour.toString() + ':' + startTime.minute.toString(),
+      DatabaseProvider.COLUMN_END_TIME: endTime.hour.toString() + ':' + endTime.minute.toString()
     };
 
     if (id != null) {
@@ -32,7 +32,12 @@ class Alert {
     name = map[DatabaseProvider.COLUMN_NAME];
     description = map[DatabaseProvider.COLUMN_DESCRIPTION];
     enabled = map[DatabaseProvider.COLUMN_ENABLED] == 1;
-    startTime = map[DatabaseProvider.COLUMN_START_TIME];
-    endTime = map[DatabaseProvider.COLUMN_END_TIME];
+    startTime = timeOfDayFromString(map[DatabaseProvider.COLUMN_START_TIME]);
+    endTime = timeOfDayFromString(map[DatabaseProvider.COLUMN_END_TIME]);
+  }
+
+  TimeOfDay timeOfDayFromString(String str) {
+    List<String> parts = str.split(':');
+    return new TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 }
