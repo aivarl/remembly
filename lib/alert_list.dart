@@ -64,8 +64,14 @@ class _AlertListState extends State<AlertList> {
   Widget build(BuildContext context) {
     print("Building entire alert list scaffold");
     return Scaffold(
-      appBar: AppBar(title: Text("remembly")),
+      //appBar: AppBar(title: Text("remembly")),
       body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/bg1.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: BlocConsumer<AlertBloc, List<Alert>>(
           builder: (context, alertList) {
             return ListView.separated(
