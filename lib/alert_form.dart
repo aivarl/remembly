@@ -27,7 +27,7 @@ class AlertFormState extends State<AlertForm> {
 
   //TODO think of default values that make sense.
   TimeOfDay _startTime = TimeOfDay.now();
-  TimeOfDay _endTime = TimeOfDay.now();
+  TimeOfDay _endTime = addMinutes(TimeOfDay.now(), 3);
   bool _enabled = true;
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -175,7 +175,8 @@ class AlertFormState extends State<AlertForm> {
                               ),
                             );
                         //TODO I guess here I should schedule the notification
-                        _periodicallyShow();
+//                        _periodicallyShow();
+                        _createDailyPeriodicalNotifications(_startTime, _endTime);
 
                         Navigator.pop(context);
                       },
@@ -212,7 +213,9 @@ class AlertFormState extends State<AlertForm> {
                                 );
                             //TODO I guess here I should schedule the notification
 //                            _scheduleNotification();
-                            _periodicallyShow();
+//                            _periodicallyShow();
+                            _createDailyPeriodicalNotifications(_startTime, _endTime);
+
 
                             Navigator.pop(context);
                           },
@@ -267,11 +270,37 @@ class AlertFormState extends State<AlertForm> {
 //  Future<void> periodicallyShow(int id, String title, String body,
 //      RepeatInterval repeatInterval, NotificationDetails notificationDetails,
 //      {String payload}) async {
-    Future<void> _periodicallyShow() async {
-      var time = Time(20, 49, 0);
-      var androidPlatformChannelSpecifics =
-      AndroidNotificationDetails('repeatDailyAtTime channel id',
-          'repeatDailyAtTime channel name', 'repeatDailyAtTime description');
+
+  void _createDailyPeriodicalNotifications(TimeOfDay start, TimeOfDay end) {
+//    var time = Time(20, 49, 0);
+    var scheduledTime = TimeOfDay(hour: start.hour, minute: start.minute);
+    _periodicallyShow(toTime(addMinutes(start, 1)));
+    while (toDouble(scheduledTime) < toDouble(end)) {
+      scheduledTime = addMinutes(scheduledTime, 1);
+//      _periodicallyShow(toTime(scheduledTime));
+//      _scheduleNotification();
+    }
+  }
+
+  static TimeOfDay addMinutes(TimeOfDay tod, int addMinutes) {
+    var hours = tod.hour;
+    var minutes = tod.minute + addMinutes;
+    while (minutes >= 60) {
+      hours++;
+      minutes = minutes - 60;
+    }
+    return TimeOfDay(hour: hours, minute: minutes);
+  }
+
+  Time toTime(TimeOfDay myTime) => Time(myTime.hour, myTime.minute);
+
+  double toDouble(TimeOfDay myTime) => myTime.hour + myTime.minute/60.0;
+
+
+    Future<void> _periodicallyShow(Time time) async {
+      var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+          'your channel id', 'your channel name', 'your channel description',
+          importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
       var iOSPlatformChannelSpecifics =
       IOSNotificationDetails();
       var platformChannelSpecifics = NotificationDetails(
@@ -280,7 +309,7 @@ class AlertFormState extends State<AlertForm> {
           0,
           'show daily title',
           'Daily notification shown at approximately ${_toTwoDigitString(time.hour)}:${_toTwoDigitString(time.minute)}:${_toTwoDigitString(time.second)}',
-          time,
+          Time(21, 50),
           platformChannelSpecifics);
     }
 
