@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:CWCFlutter/bloc/alert_bloc.dart';
 import 'package:CWCFlutter/db/database_provider.dart';
@@ -132,10 +133,25 @@ class AlertFormState extends State<AlertForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Alert Form")),
+      appBar: AppBar(title: Text("Add a reminder"),),
       body: Container(
-        margin: EdgeInsets.all(24),
-        child: Form(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/bg1.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: BackdropFilter(
+    filter: ImageFilter.blur(
+    sigmaX: 2.0,
+    sigmaY: 2.0,
+    ),
+    child:Container(
+        child: Container(
+              color: Colors.white54,
+              child: Container(
+    margin: EdgeInsets.all(24),
+    child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -176,7 +192,7 @@ class AlertFormState extends State<AlertForm> {
                             );
                         //TODO I guess here I should schedule the notification
 //                        _periodicallyShow();
-                        _createDailyPeriodicalNotifications(_startTime, _endTime);
+                        _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description);
 
                         Navigator.pop(context);
                       },
@@ -214,7 +230,7 @@ class AlertFormState extends State<AlertForm> {
                             //TODO I guess here I should schedule the notification
 //                            _scheduleNotification();
 //                            _periodicallyShow();
-                            _createDailyPeriodicalNotifications(_startTime, _endTime);
+                            _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description);
 
 
                             Navigator.pop(context);
@@ -233,7 +249,7 @@ class AlertFormState extends State<AlertForm> {
           ),
         ),
       ),
-    );
+    )))));
   }
 
   //TODO params for laters
@@ -271,13 +287,13 @@ class AlertFormState extends State<AlertForm> {
 //      RepeatInterval repeatInterval, NotificationDetails notificationDetails,
 //      {String payload}) async {
 
-  void _createDailyPeriodicalNotifications(TimeOfDay start, TimeOfDay end) {
+  void _createDailyPeriodicalNotifications(TimeOfDay start, TimeOfDay end, String name, String description) {
 //    var time = Time(20, 49, 0);
     var scheduledTime = TimeOfDay(hour: start.hour, minute: start.minute);
-    _periodicallyShow(toTime(addMinutes(start, 1)));
+    //_periodicallyShow(toTime(addMinutes(start, 5)));
     while (toDouble(scheduledTime) < toDouble(end)) {
-      scheduledTime = addMinutes(scheduledTime, 1);
-//      _periodicallyShow(toTime(scheduledTime));
+      scheduledTime = addMinutes(scheduledTime, 3);
+      _periodicallyShow(toTime(scheduledTime), name, description);
 //      _scheduleNotification();
     }
   }
@@ -297,9 +313,9 @@ class AlertFormState extends State<AlertForm> {
   double toDouble(TimeOfDay myTime) => myTime.hour + myTime.minute/60.0;
 
 
-    Future<void> _periodicallyShow(Time time) async {
+    Future<void> _periodicallyShow(Time time, String name, String description) async {
       var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-          'your channel id', 'your channel name', 'your channel description',
+          'periodical channel id', 'periodical channel name', 'your channel description',
           importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
       var iOSPlatformChannelSpecifics =
       IOSNotificationDetails();
@@ -307,9 +323,9 @@ class AlertFormState extends State<AlertForm> {
           androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
       await flutterLocalNotificationsPlugin.showDailyAtTime(
           0,
-          'show daily title',
-          'Daily notification shown at approximately ${_toTwoDigitString(time.hour)}:${_toTwoDigitString(time.minute)}:${_toTwoDigitString(time.second)}',
-          Time(21, 50),
+          '${name}',
+          '${description}. Shown at: ${_toTwoDigitString(time.hour)}:${_toTwoDigitString(time.minute)}:${_toTwoDigitString(time.second)}',
+          time,
           platformChannelSpecifics);
     }
 

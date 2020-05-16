@@ -72,29 +72,36 @@ class _AlertListState extends State<AlertList> {
             fit: BoxFit.cover,
           ),
         ),
-        child: BlocConsumer<AlertBloc, List<Alert>>(
+        child: Container(
+          margin: EdgeInsets.all(24),
+
+          child:BlocConsumer<AlertBloc, List<Alert>>(
           builder: (context, alertList) {
             return ListView.separated(
               itemBuilder: (BuildContext context, int index) {
                 print("alertList: $alertList");
 
                 Alert alert = alertList[index];
-                return ListTile(
+                return Card(
+                  color: Colors.white70,
+                  child: InkWell(
+                    splashColor: Colors.blue,
+                    child: ListTile(
                     title: Text(alert.name, style: TextStyle(fontSize: 25)),
                     subtitle: Text(
-                      "${alert.description}\n${alert.startTime} - ${alert.endTime}\nEnabled: ${alert.enabled}",
+                      "${alert.description}\nRepeat interval:\nEnabled: ${alert.enabled}",
                       style: TextStyle(fontSize: 15),
                     ),
-                    trailing: Text("${alert.startTime} - ${alert.endTime}"),
-                    onTap: () => showAlertDialog(context, alert, index));
+                    trailing: Text("${timeStr(alert.startTime)} - ${timeStr(alert.endTime)}"),
+                    onTap: () => showAlertDialog(context, alert, index))));
               },
               itemCount: alertList.length,
-              separatorBuilder: (BuildContext context, int index) => Divider(color: Colors.black),
+              separatorBuilder: (BuildContext context, int index) => Divider(color: Colors.transparent),
             );
           },
           listener: (BuildContext context, alertList) {},
         ),
-      ),
+      )),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () => Navigator.push(
@@ -104,4 +111,18 @@ class _AlertListState extends State<AlertList> {
       ),
     );
   }
+
+  String timeStr(TimeOfDay tod) {
+    String _addLeadingZeroIfNeeded(int value) {
+      if (value < 10)
+        return '0$value';
+      return value.toString();
+    }
+
+    final String hourLabel = _addLeadingZeroIfNeeded(tod.hour);
+    final String minuteLabel = _addLeadingZeroIfNeeded(tod.minute);
+
+    return '$hourLabel:$minuteLabel';
+  }
+
 }
