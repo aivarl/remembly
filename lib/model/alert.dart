@@ -8,8 +8,9 @@ class Alert {
   TimeOfDay startTime;
   TimeOfDay endTime;
   bool enabled;
+  int interval;
 
-  Alert({this.id, this.name, this.description, this.enabled, this.startTime, this.endTime});
+  Alert({this.id, this.name, this.description, this.enabled, this.startTime, this.endTime, this.interval});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -17,7 +18,8 @@ class Alert {
       DatabaseProvider.COLUMN_DESCRIPTION: description,
       DatabaseProvider.COLUMN_ENABLED: enabled ? 1 : 0,
       DatabaseProvider.COLUMN_START_TIME: startTime.hour.toString() + ':' + startTime.minute.toString(),
-      DatabaseProvider.COLUMN_END_TIME: endTime.hour.toString() + ':' + endTime.minute.toString()
+      DatabaseProvider.COLUMN_END_TIME: endTime.hour.toString() + ':' + endTime.minute.toString(),
+      DatabaseProvider.COLUMN_INTERVAL: interval
     };
 
     if (id != null) {
@@ -34,6 +36,7 @@ class Alert {
     enabled = map[DatabaseProvider.COLUMN_ENABLED] == 1;
     startTime = timeOfDayFromString(map[DatabaseProvider.COLUMN_START_TIME]);
     endTime = timeOfDayFromString(map[DatabaseProvider.COLUMN_END_TIME]);
+    interval = map[DatabaseProvider.COLUMN_INTERVAL];
   }
 
   TimeOfDay timeOfDayFromString(String str) {

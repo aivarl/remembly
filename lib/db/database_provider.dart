@@ -13,6 +13,7 @@ class DatabaseProvider {
   static const String COLUMN_ENABLED = "enabled";
   static const String COLUMN_START_TIME = "startTime";
   static const String COLUMN_END_TIME = "endTime";
+  static const String COLUMN_INTERVAL = "interval";
 
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
@@ -47,7 +48,8 @@ class DatabaseProvider {
           "$COLUMN_DESCRIPTION TEXT,"
           "$COLUMN_ENABLED INTEGER,"
           "$COLUMN_START_TIME DATETIME,"
-          "$COLUMN_END_TIME DATETIME"
+          "$COLUMN_END_TIME DATETIME,"
+          "$COLUMN_INTERVAL INTEGER"
           ")",
         );
       },
@@ -58,7 +60,8 @@ class DatabaseProvider {
     final db = await database;
 
     var alerts = await db
-        .query(TABLE_ALERT, columns: [COLUMN_ID, COLUMN_NAME, COLUMN_DESCRIPTION, COLUMN_ENABLED, COLUMN_START_TIME, COLUMN_END_TIME]);
+        .query(TABLE_ALERT, columns: [COLUMN_ID, COLUMN_NAME, COLUMN_DESCRIPTION, COLUMN_ENABLED,
+      COLUMN_START_TIME, COLUMN_END_TIME, COLUMN_INTERVAL]);
 
     List<Alert> alertList = List<Alert>();
 

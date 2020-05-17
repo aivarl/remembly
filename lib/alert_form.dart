@@ -25,11 +25,10 @@ class AlertForm extends StatefulWidget {
 class AlertFormState extends State<AlertForm> {
   String _name;
   String _description;
-
-  //TODO think of default values that make sense.
   TimeOfDay _startTime = TimeOfDay.now();
-  TimeOfDay _endTime = addMinutes(TimeOfDay.now(), 3);
+  TimeOfDay _endTime = TimeOfDay.now();
   bool _enabled = true;
+  int _interval = 30;
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -40,7 +39,7 @@ class AlertFormState extends State<AlertForm> {
     return TextFormField(
       initialValue: _name,
       decoration: InputDecoration(labelText: 'Name'),
-      maxLength: 15,
+      maxLength: 30,
       style: TextStyle(fontSize: 20),
       validator: (String value) {
         if (value.isEmpty) {
@@ -59,15 +58,15 @@ class AlertFormState extends State<AlertForm> {
     return TextFormField(
       initialValue: _description,
       decoration: InputDecoration(labelText: 'Description'),
-      keyboardType: TextInputType.number,
+      maxLength: 50,
       style: TextStyle(fontSize: 20),
-      validator: (String value) {
+/*      validator: (String value) {
         int description = int.tryParse(value);
 //        if (description == null || description <= 0) {
 //          return 'Calories must be greater than 0';
 //        }
         return null;
-      },
+      },*/
       onSaved: (String value) {
         _description = value;
       },
@@ -118,6 +117,26 @@ class AlertFormState extends State<AlertForm> {
     );
   }
 
+  Widget _buildInterval() {
+    return TextFormField(
+      initialValue: _interval.toString(),
+      decoration: InputDecoration(labelText: 'Interval (minutes)'),
+      keyboardType: TextInputType.number,
+      maxLength: 50,
+      style: TextStyle(fontSize: 20),
+      validator: (String value) {
+        int interval = int.tryParse(value);
+        if (interval == null) {
+          return 'Repeat interval is required';
+        }
+        return null;
+      },
+      onSaved: (String value) {
+        _interval = int.tryParse(value);
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -127,6 +146,7 @@ class AlertFormState extends State<AlertForm> {
       _enabled = widget.alert.enabled;
       _startTime = widget.alert.startTime;
       _endTime = widget.alert.endTime;
+      _interval = widget.alert.interval;
     }
   }
 
@@ -160,6 +180,7 @@ class AlertFormState extends State<AlertForm> {
               _buildDescription(),
               _buildStartTime(),
               _buildEndTime(),
+              _buildInterval(),
               SizedBox(height: 14),
               _buildenabled(),
               SizedBox(height: 20),
@@ -182,6 +203,7 @@ class AlertFormState extends State<AlertForm> {
                           enabled: _enabled,
                           startTime: _startTime,
                           endTime: _endTime,
+                          interval: _interval,
                         );
 
                         DatabaseProvider.db.insert(alert).then(
@@ -192,7 +214,7 @@ class AlertFormState extends State<AlertForm> {
                             );
                         //TODO I guess here I should schedule the notification
 //                        _periodicallyShow();
-                        _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description);
+                        _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description, _interval);
                         _logPendingNotifications();
 
 
@@ -221,6 +243,7 @@ class AlertFormState extends State<AlertForm> {
                               enabled: _enabled,
                               startTime: _startTime,
                               endTime: _endTime,
+                              interval: _interval,
                             );
 
                             DatabaseProvider.db.update(widget.alert).then(
@@ -232,7 +255,7 @@ class AlertFormState extends State<AlertForm> {
                             //TODO I guess here I should schedule the notification
 //                            _scheduleNotification();
 //                            _periodicallyShow();
-                            _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description);
+                            _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description, _interval);
                             _logPendingNotifications();
 
 
@@ -302,13 +325,13 @@ class AlertFormState extends State<AlertForm> {
 //      RepeatInterval repeatInterval, NotificationDetails notificationDetails,
 //      {String payload}) async {
 
-  void _createDailyPeriodicalNotifications(TimeOfDay start, TimeOfDay end, String name, String description) {
+  void _createDailyPeriodicalNotifications(TimeOfDay start, TimeOfDay end, String name, String description, int interval) {
 //    var time = Time(20, 49, 0);
     var scheduledTime = TimeOfDay(hour: start.hour, minute: start.minute);
     //_periodicallyShow(toTime(addMinutes(start, 5)));
-    while (toDouble(scheduledTime) < toDouble(end)) {
-      scheduledTime = addMinutes(scheduledTime, 40);
+    while (toDouble(scheduledTime) <= toDouble(end)) {
       _periodicallyShow(toTime(scheduledTime), name, description);
+      scheduledTime = addMinutes(scheduledTime, interval);
 //      _scheduleNotification();
     }
   }
@@ -330,7 +353,7 @@ class AlertFormState extends State<AlertForm> {
 
     Future<void> _periodicallyShow(Time time, String name, String description) async {
       var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-          'periodical channel id', 'periodical channel name', 'your channel description',
+          name, name, description,
           importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
       var iOSPlatformChannelSpecifics =
       IOSNotificationDetails();

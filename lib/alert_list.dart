@@ -89,7 +89,7 @@ class _AlertListState extends State<AlertList> {
                     child: ListTile(
                     title: Text(alert.name, style: TextStyle(fontSize: 25)),
                     subtitle: Text(
-                      "${alert.description}\nRepeat interval:\nEnabled: ${alert.enabled}",
+                      "${alert.description}\nRepeat interval: ${alert.interval} minutes.\nEnabled: ${alert.enabled}",
                       style: TextStyle(fontSize: 15),
                     ),
                     trailing: Text("${timeStr(alert.startTime)} - ${timeStr(alert.endTime)}"),
@@ -111,7 +111,7 @@ class _AlertListState extends State<AlertList> {
             FloatingActionButton(
               heroTag: "back",
               onPressed: () {},
-              child: Icon(Icons.navigate_before),
+              child: Icon(Icons.menu),
             ),
             FloatingActionButton(
               heroTag: "alertForm",
@@ -134,10 +134,8 @@ class _AlertListState extends State<AlertList> {
         return '0$value';
       return value.toString();
     }
-
     final String hourLabel = _addLeadingZeroIfNeeded(tod.hour);
     final String minuteLabel = _addLeadingZeroIfNeeded(tod.minute);
-
     return '$hourLabel:$minuteLabel';
   }
 
