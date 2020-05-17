@@ -102,13 +102,29 @@ class _AlertListState extends State<AlertList> {
           listener: (BuildContext context, alertList) {},
         ),
       )),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (BuildContext context) => AlertForm()),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            FloatingActionButton(
+              heroTag: "back",
+              onPressed: () {},
+              child: Icon(Icons.navigate_before),
+            ),
+            FloatingActionButton(
+              heroTag: "alertForm",
+              child: Icon(Icons.add),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (BuildContext context) => AlertForm()),
+              ),
+            ),
+          ],
         ),
-      ),
+      )
+      ,
     );
   }
 

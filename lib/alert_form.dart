@@ -193,6 +193,8 @@ class AlertFormState extends State<AlertForm> {
                         //TODO I guess here I should schedule the notification
 //                        _periodicallyShow();
                         _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description);
+                        _logPendingNotifications();
+
 
                         Navigator.pop(context);
                       },
@@ -231,6 +233,7 @@ class AlertFormState extends State<AlertForm> {
 //                            _scheduleNotification();
 //                            _periodicallyShow();
                             _createDailyPeriodicalNotifications(_startTime, _endTime, _name, _description);
+                            _logPendingNotifications();
 
 
                             Navigator.pop(context);
@@ -250,6 +253,18 @@ class AlertFormState extends State<AlertForm> {
         ),
       ),
     )))));
+  }
+
+  void _logPendingNotifications() async {
+    var pendingNotificationRequests =
+        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+    for (PendingNotificationRequest pnr in pendingNotificationRequests) {
+      print(pnr.id);
+      print(pnr.title);
+      print(pnr.body);
+      print(pnr.payload);
+      print("------------");
+    }
   }
 
   //TODO params for laters
@@ -277,7 +292,7 @@ class AlertFormState extends State<AlertForm> {
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.schedule(
-        0,
+        UniqueKey().hashCode,
         'scheduled title',
         'scheduled body',
         scheduledNotificationDateTime,
@@ -292,7 +307,7 @@ class AlertFormState extends State<AlertForm> {
     var scheduledTime = TimeOfDay(hour: start.hour, minute: start.minute);
     //_periodicallyShow(toTime(addMinutes(start, 5)));
     while (toDouble(scheduledTime) < toDouble(end)) {
-      scheduledTime = addMinutes(scheduledTime, 3);
+      scheduledTime = addMinutes(scheduledTime, 40);
       _periodicallyShow(toTime(scheduledTime), name, description);
 //      _scheduleNotification();
     }
@@ -322,7 +337,7 @@ class AlertFormState extends State<AlertForm> {
       var platformChannelSpecifics = NotificationDetails(
           androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
       await flutterLocalNotificationsPlugin.showDailyAtTime(
-          0,
+          UniqueKey().hashCode,
           '${name}',
           '${description}. Shown at: ${_toTwoDigitString(time.hour)}:${_toTwoDigitString(time.minute)}:${_toTwoDigitString(time.second)}',
           time,
